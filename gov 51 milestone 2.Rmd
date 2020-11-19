@@ -4,6 +4,22 @@ author: Adam Aleksic
 output: pdf_document
 ---
 
+## Data Set
+
+Data set: https://catalog.data.gov/dataset/racial-and-social-equity-composite-index-a44fc
+
+Understanding the variables: https://data-seattlecitygis.opendata.arcgis.com/datasets/225a4c2c50e94f2cb548a046217f49f7_0?geometry=-122.509%2C47.574%2C-122.164%2C47.655
+
+This data set examines linguistic, racial, ethnic, income, education, and health statistics for census tracts in Seattle.
+
+I want to examine how the percent of English language learners in census tracts correlates with factors like obesity, poverty, education level, asthma, diabetes, and mental health.
+
+## New Research Question
+
+Will census tracts with higher percentages of English language learners have health, income, and education disadvantages relative to census tracts with lower percentages of English language learners? In this study, I plan to use public information released by the city of Seattle to visualize the correlations between ELL status and certain health, education, and income variables. I hypothesize that, because ELL speakers tend to live in institutionally disadvantaged areas, census tracts with more ELL speakers will average higher incidences of asthma, obesity, diabetes, and mental health issues, and lower education levels and income statuses.
+
+## Analyses
+
 ```{r}
 
 library(tidyverse)
@@ -30,7 +46,14 @@ ggplot(aes(x = PCT_ENGLISH_LESSTHAN_VERY_WELL, y = PCT_LESS_BACHELOR_DEGREE)) +
 education
 education_fit <- lm(PCT_ENGLISH_LESSTHAN_VERY_WELL ~ PCT_LESS_BACHELOR_DEGREE, data = seattle)
 education_fit_sum <- summary(education_fit)
-education_fit_sum$r.squared
+education_fit_sum
+
+education_stats <- seattle %>%
+  group_by(PCT_ENGLISH_LESSTHAN_VERY_WELL, PCT_LESS_BACHELOR_DEGREE) %>%
+  summarise(bach_mean = mean(PCT_LESS_BACHELOR_DEGREE),
+            bach_se = sd(PCT_LESS_BACHELOR_DEGREE) / sqrt(n()), .groups = "drop") %>%
+  pivot_wider(names_from = PCT_ENGLISH_LESSTHAN_VERY_WELL, values_from = c(bach_mean, bach_se)) 
+
 
 ```
 
@@ -46,9 +69,14 @@ ggplot(aes(x = PCT_ENGLISH_LESSTHAN_VERY_WELL, y = PCT_ADULT_OBESE)) +
  theme_minimal() +
  geom_smooth(method = lm, se = FALSE)
 obese
+
+# pretty standard scatterplot. I'm doing the same thing for all the other variables so I won't comment much.
+
 obese_fit <- lm(PCT_ADULT_OBESE ~ PCT_LESS_BACHELOR_DEGREE, data = seattle)
 obese_fit_sum <- summary(obese_fit)
-obese_fit_sum$r.squared
+obese_fit_sum
+
+# finding regression info
 
 ```
 
@@ -65,7 +93,9 @@ ggplot(aes(x = PCT_ENGLISH_LESSTHAN_VERY_WELL, y = PCT_ADULT_WITH_ASTHMA)) +
 asthma
 asthma_fit <- lm(PCT_ADULT_WITH_ASTHMA ~ PCT_LESS_BACHELOR_DEGREE, data = seattle)
 asthma_fit_sum <- summary(asthma_fit)
-asthma_fit_sum$r.squared
+asthma_fit_sum
+
+# this one has the smallest r^2 out of the factors I've looked at. Clearly not going to be statistically significant.
 
 ```
 
@@ -82,7 +112,7 @@ ggplot(aes(x = PCT_ENGLISH_LESSTHAN_VERY_WELL, y = SOCIOECONOMIC_PERCENTILE)) +
 socioeconomic
 socioeconomic_fit <- lm(SOCIOECONOMIC_PERCENTILE ~ PCT_LESS_BACHELOR_DEGREE, data = seattle)
 socioeconomic_fit_sum <- summary(socioeconomic_fit)
-socioeconomic_fit_sum$r.squared
+socioeconomic_fit_sum
 
 ```
 
@@ -99,7 +129,24 @@ ggplot(aes(x = PCT_ENGLISH_LESSTHAN_VERY_WELL, y = PCT_ADULTMENTALHEALTHNOTGOOD)
 mental
 mental_fit <- lm(PCT_ADULTMENTALHEALTHNOTGOOD ~ PCT_LESS_BACHELOR_DEGREE, data = seattle)
 mental_fit_sum <- summary(mental_fit)
-mental_fit_sum$r.squared
+mental_fit_sum
+
+```
+
+```{r, diabetes}
+
+diabetes <- seattle %>%
+ggplot(aes(x = PCT_ENGLISH_LESSTHAN_VERY_WELL, y = PCT_ADULT_WITH_DIABETES)) +
+ geom_point(color = "dodgerblue4") +
+ labs(title = "Lack of English Proficiency versus Incidence of Diabetes",
+      x = "Percentage of English Language Learners",
+      y = "Percentage of Adults with Diabetes") +
+ theme_minimal() +
+ geom_smooth(method = lm, se = FALSE)
+diabetes
+diabetes_fit <- lm(PCT_ADULTMENTALHEALTHNOTGOOD ~ PCT_ADULT_WITH_DIABETES, data = seattle)
+diabetes_fit_sum <- summary(diabetes_fit)
+diabetes_fit_sum
 
 ```
 
