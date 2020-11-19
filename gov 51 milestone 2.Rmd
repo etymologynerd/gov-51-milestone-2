@@ -1,5 +1,5 @@
 ---
-title: "Final Project Milestone 1: Proposal"
+title: "Final Project Milestone 2: Upated Proposal and Analyses"
 author: Adam Aleksic
 output: pdf_document
 ---
@@ -16,7 +16,7 @@ I want to examine how the percent of English language learners in census tracts 
 
 ## New Research Question
 
-Will census tracts with higher percentages of English language learners have health, income, and education disadvantages relative to census tracts with lower percentages of English language learners? In this study, I plan to use public information released by the city of Seattle to visualize the correlations between ELL status and certain health, education, and income variables. I hypothesize that, because ELL speakers tend to live in institutionally disadvantaged areas, census tracts with more ELL speakers will average higher incidences of asthma, obesity, diabetes, and mental health issues, and lower education levels and income statuses.
+Will census tracts with higher percentages of English language learners have health, income, and education disadvantages relative to census tracts with lower percentages of English language learners? In this study, I plan to use public information released by the city of Seattle to visualize the correlations between ELL status and certain health, education, and income variables. I hypothesize that, because ELL speakers tend to live in institutionally disadvantaged areas and tend to be of institutionally disadvantaged demographics, census tracts with more ELL speakers will average higher incidences of asthma, obesity, diabetes, and mental health issues, and lower education levels and income statuses.
 
 ## Analyses
 
@@ -28,7 +28,7 @@ library(ggplot2)
 seattle <- read.csv("~/Downloads/Gov/Racial_and_Social_Equity_Composite_Index.csv") %>%
  na.omit()
 
-# setting up my data
+# setting up my data. It's very clean already so I thankfully don't have to do much
 
 ```
 
@@ -44,16 +44,14 @@ ggplot(aes(x = PCT_ENGLISH_LESSTHAN_VERY_WELL, y = PCT_LESS_BACHELOR_DEGREE)) +
  theme_minimal() +
  geom_smooth(method = lm, se = FALSE)
 education
+
+# pretty standard scatterplot. I'm doing the same thing for all the other variables so I won't comment much.
+
 education_fit <- lm(PCT_ENGLISH_LESSTHAN_VERY_WELL ~ PCT_LESS_BACHELOR_DEGREE, data = seattle)
 education_fit_sum <- summary(education_fit)
 education_fit_sum
 
-education_stats <- seattle %>%
-  group_by(PCT_ENGLISH_LESSTHAN_VERY_WELL, PCT_LESS_BACHELOR_DEGREE) %>%
-  summarise(bach_mean = mean(PCT_LESS_BACHELOR_DEGREE),
-            bach_se = sd(PCT_LESS_BACHELOR_DEGREE) / sqrt(n()), .groups = "drop") %>%
-  pivot_wider(names_from = PCT_ENGLISH_LESSTHAN_VERY_WELL, values_from = c(bach_mean, bach_se)) 
-
+# finding regression info
 
 ```
 
@@ -69,14 +67,9 @@ ggplot(aes(x = PCT_ENGLISH_LESSTHAN_VERY_WELL, y = PCT_ADULT_OBESE)) +
  theme_minimal() +
  geom_smooth(method = lm, se = FALSE)
 obese
-
-# pretty standard scatterplot. I'm doing the same thing for all the other variables so I won't comment much.
-
 obese_fit <- lm(PCT_ADULT_OBESE ~ PCT_LESS_BACHELOR_DEGREE, data = seattle)
 obese_fit_sum <- summary(obese_fit)
 obese_fit_sum
-
-# finding regression info
 
 ```
 
@@ -149,23 +142,3 @@ diabetes_fit_sum <- summary(diabetes_fit)
 diabetes_fit_sum
 
 ```
-
-# Stuff from Milestone 1
-
-## Data Set
-
-Data set: https://catalog.data.gov/dataset/racial-and-social-equity-composite-index-a44fc
-
-Understanding the variables: https://data-seattlecitygis.opendata.arcgis.com/datasets/225a4c2c50e94f2cb548a046217f49f7_0?geometry=-122.509%2C47.574%2C-122.164%2C47.655
-
-This data set examines linguistic, racial, ethnic, income, education, and health statistics for census tracts in Seattle.
-
-I want to examine how the percent of English language learners in census tracts correlates with factors like obesity, poverty, education level, asthma, and mental health.
-
-From what I've seen of it, this data set is excellent because it has a lot of information I can draw from and is "clean" so I don't need to recode too much. It is also well under the recommended cap of 50 MB.
-
-## Proposal
-
-Research question: How much of a socioeconomic advantage do English speakers have over non-English speakers in Seattle? In this study, I plan to use public information released by the city of Seattle to visualize the connection between ELL status and certain health, education, and income variables. I hypothesize that, because of the institutional advantages of knowing English in America, English speakers will tend to be healthier, more educated, and have higher-paying jobs. The explanatory variable in this experiment is the amount of ELL people living in census tracts (represented in the data with a percentage, but I might break this up into a few bins) and the dependent variable is the variation in education level, income, asthma rates, mental health, and diabetes rates (also measured with percentages). I will test my hypothesis by trying to make all other factors equal and then plotting ELL percentages against the other variables I'm studying. If, after controlling for all those other factors, the lower-income census tracts have statistically significant worse health, education, and income, the pattern would support my hypothesis.
-
-I plan to do this project by myself.
